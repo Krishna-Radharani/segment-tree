@@ -1,0 +1,41 @@
+class Solution{
+public:
+    //first build segment tree format(index,low value of range,high value of range)
+    void segmentTree(int i,int l,int r,vector<int>&segTre,int arr[]){
+        if(l==r){
+            segTre[i]=arr[l];
+            return;
+        }
+        //build tree recursively
+        int mid=l+(r-l)/2;
+        //left tree
+        segmentTree(2*i+1,l,mid,segTre,arr);
+        segmentTree(2*i+2,mid+1,r,segTre,arr); //right tree
+        segTre[i]=segTre[2*i+1]+segTre[2*i+2];
+    }
+     
+    int Query(int i,int l,int r,int start,int end,vector<int>&segTre){
+            //if the range of a node entirely lies in query range
+            if(start<=l && end>=r) return segTre[i];
+            //if query range is outside the node range
+            if(start>r || end<l) return 0;
+             int mid=l+(r-l)/2;
+           return Query(2*i+1,l,mid,start,end,segTre)+Query(2*i+2,mid+1,r,start,end,segTre);
+    }
+    vector<int> querySum(int n, int arr[], int q, int queries[])
+    {
+        // code 
+        vector<int>segTre(4*n,0);
+        segmentTree(0,0,n-1,segTre,arr);
+        vector<int>result;
+        //2q-2 because it's pair form then why iterating all the elements .it will be going till second last element
+        for(int i=0;i<=2*q-2;i=i+2){
+            int start=queries[i]-1;
+            int end=queries[i+1]-1;
+            int res=Query(0,0,n-1,start,end,segTre);
+            result.push_back(res);
+            
+        }
+        return result;
+    }
+};
